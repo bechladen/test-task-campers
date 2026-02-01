@@ -1,0 +1,137 @@
+.panel {
+  display: grid;
+  gap: 28px;
+}
+
+.group {
+  display: grid;
+  gap: 12px;
+}
+
+.label {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.subheading {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.sectionTitle {
+  margin-top: 10px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin-top: 10px;
+}
+
+.inputWrap {
+  position: relative;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+}
+
+.input {
+  width: 100%;
+  height: 56px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-soft);
+  padding: 0 16px 0 44px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.gridTypes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.tile {
+  height: 96px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 10px;
+}
+
+.tileActive {
+  border-color: var(--color-primary);
+}
+
+.tileIcon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-text);
+}
+
+.tileLabel {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.actions {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.primary {
+  height: 56px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.secondary {
+  height: 56px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary:hover {
+  border-color: var(--color-primary);
+}
+
