@@ -11,6 +11,9 @@ export function ImageLightbox({ isOpen, images, startIndex = 0, onClose }) {
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
+  const stageRef = useRef(null)
+  const imgRef = useRef(null)
+  const [baseSize, setBaseSize] = useState({ w: 0, h: 0 })
   const dragRef = useRef({
     active: false,
     startX: 0,
@@ -24,6 +27,7 @@ export function ImageLightbox({ isOpen, images, startIndex = 0, onClose }) {
     setIndex(Math.max(0, Math.min(startIndex, safeImages.length - 1)))
     setOffset({ x: 0, y: 0 })
     setIsHovering(false)
+    setBaseSize({ w: 0, h: 0 })
   }, [isOpen, startIndex, safeImages.length])
 
   const canShow = isOpen && safeImages.length > 0
@@ -35,11 +39,38 @@ export function ImageLightbox({ isOpen, images, startIndex = 0, onClose }) {
     setIndex((i) => (i - 1 + safeImages.length) % safeImages.length)
     setOffset({ x: 0, y: 0 })
     setIsHovering(false)
+    setBaseSize({ w: 0, h: 0 })
   }
   const next = () => {
     setIndex((i) => (i + 1) % safeImages.length)
     setOffset({ x: 0, y: 0 })
     setIsHovering(false)
+    setBaseSize({ w: 0, h: 0 })
+  }
+
+  const onImageLoad = () => {
+    // Capture the “fit” size at zoom=1, used to calculate pan bounds.
+    const rect = imgRef.current?.getBoundingClientRect()
+    if (!rect) return
+    setBaseSize({ w: rect.width, h: rect.height })
+  }
+
+  const onMouseMove = (e) => {
+    if (!isHovering || isDragging || zoom <= 1) return
+    const stageRect = stageRef.current?.getBoundingClientRect()
+    if (!stageRect) return
+
+    const relX = clamp01((e.clientX - stageRect.left) / stageRect.width)
+    const relY = clamp01((e.clientY - stageRect.top) / stageRect.height)
+
+    const maxPanX = Math.max(0, (baseSize.w * zoom - stageRect.width) / 2)
+    const maxPanY = Math.max(0, (baseSize.h * zoom - stageRect.height) / 2)
+
+    // Move image opposite to cursor to reveal the hovered area.
+    const x = (0.5 - relX) * 2 * maxPanX
+    const y = (0.5 - relY) * 2 * maxPanY
+
+    setOffset({ x, y })
   }
 
   const onPointerDown = (e) => {
@@ -109,12 +140,14 @@ export function ImageLightbox({ isOpen, images, startIndex = 0, onClose }) {
 
       <div
         className={styles.stage}
+        ref={stageRef}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => {
           setIsHovering(false)
           setOffset({ x: 0, y: 0 })
           endDrag()
         }}
+        onMouseMove={onMouseMove}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
@@ -122,17 +155,28 @@ export function ImageLightbox({ isOpen, images, startIndex = 0, onClose }) {
         data-zoomed={zoom > 1 ? 'true' : 'false'}
         data-dragging={isDragging ? 'true' : 'false'}
       >
-        <img
-          className={styles.image}
-          src={src}
-          alt={`Preview ${index + 1}`}
-          style={{
-            transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
-          }}
-          draggable="false"
-        />
+        <div
+          className={styles.pan}
+          style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
+        >
+          <img
+            ref={imgRef}
+            className={styles.image}
+            src={src}
+            alt={`Preview ${index + 1}`}
+            style={{ transform: `scale(${zoom})` }}
+            onLoad={onImageLoad}
+            draggable="false"
+          />
+        </div>
       </div>
     </Modal>
   )
+}
+
+function clamp01(n) {
+  if (n < 0) return 0
+  if (n > 1) return 1
+  return n
 }
 
